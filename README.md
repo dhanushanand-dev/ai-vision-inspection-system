@@ -6,6 +6,8 @@
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8)
 ![Hardware](https://img.shields.io/badge/hardware-NVIDIA%20Jetson%20Orin%20Nano-76B900)
 ![Camera](https://img.shields.io/badge/camera-Basler%20%7C%20USB%20%7C%20phone-informational)
+![GUI](https://img.shields.io/badge/GUI-PyQt6-41CD52)
+![PLC](https://img.shields.io/badge/PLC-Modbus%20TCP-orange)
 
 ---
 
@@ -40,7 +42,19 @@ The same part is placed at different angles. The zones follow the part, and the 
   - Any OpenCV/USB webcam.
   - A phone camera over the *IP Webcam* app.
   - A software mock camera for testing.
-- **Operator UI:**
+- **Robust preprocessing for metallic parts:** LAB L-channel with **CLAHE** contrast enhancement, edge evidence, and contour/mask extraction, with debug overlays.
+- **Hole detection and presence/absence checks:** hole-mask generation and profile extraction for sprocket/gear-like parts.
+- **36-angle part pose handling:** parts can be inspected at any rotation.
+- **PLC integration over Modbus TCP:** the PLC triggers each inspection and the system writes the verdict back on coils:
+
+  | Signal | Modbus coil |
+  |---|---|
+  | Trigger (PLC → vision) | `00007` |
+  | OK (vision → PLC) | `00116` |
+  | NG (vision → PLC) | `00117` |
+  | DONE (vision → PLC) | `00101` |
+
+- **PyQt6 operator UI:**
   - A launcher plus a camera-settings screen.
   - A dark industrial theme with mouse/touch controls and a big OK/NG banner.
   - FPS and image-quality readouts (brightness, contrast, sharpness).
@@ -116,13 +130,19 @@ It includes a camera-free smoke test of the tracker and zone comparator.
 - Real-time systems: threaded capture and processing, performance tuning, frame-level debouncing
 - Industrial machine-vision workflow: teach/inspect, reference and inspection zones, OK/NG decisions
 - Edge deployment and hardware integration: NVIDIA Jetson Orin Nano, Basler industrial cameras (pypylon), USB and IP cameras
-- Python software design: modular processing pipeline, dataclasses, configuration, operator UI
+- Python software design: modular processing pipeline, dataclasses, configuration, PyQt6 operator UI
+- Industrial integration: Modbus TCP handshake with a PLC (trigger / OK / NG / DONE)
 
 ## Notes
 
 - Taught masters are saved locally on the inspection computer. Each new part type is taught from one good sample.
 - This uses classical computer vision (OpenCV), not a trained deep-learning model, so it works from a single good sample.
 
+## Roadmap
+
+- Scratch and dent detection using YOLO-based segmentation (planned, not yet implemented).
+- Measured accuracy, cycle time and false-reject rate on production parts.
+
 ## Author
 
-**Dhanush Anand** · [GitHub @dhanushanand-dev](https://github.com/dhanushanand-dev)
+**Dhanush Anand** · [GitHub @dhanushanand-dev](https://github.com/dhanushanand-dev) · [LinkedIn](https://linkedin.com/in/dhanushanand-dev)
